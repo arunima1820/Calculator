@@ -1,6 +1,7 @@
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /*
  * @author Arunima Mittra
@@ -8,119 +9,484 @@ import javax.swing.UnsupportedLookAndFeelException;
  * Course: CS 2336.502 
            Dr. Khan
  */
-public class calculatorMain extends javax.swing.JFrame {
-    String answerStr;
-    String equationStr;
-    boolean replace; //replaces or adds digits to number
+
+public class calculatorMain extends  JFrame {
+	// variables
+		String answerStr;
+	    String equationStr;
+	    boolean replace; //replaces or adds digits to number
+	    String numSystem;
+	    int toggleCounter;
+	
+//button declarations
+	
+	// number keys
+    private JButton a;
+    private JButton b;
+    private JButton c;
+    private JButton d;
+    private JButton e;
+    private JButton f;
+
+    private JButton zero;
+    private JButton one;
+    private JButton two;
+    private JButton three;
+    private JButton four;
+    private JButton five;
+    private JButton six;
+    private JButton seven;
+    private JButton eight;
+    private JButton nine;
     
-    /**
-     * Creates new form calculatorMain
-     */
+// functional operations
+    // math
+    private JButton add;
+    private JButton sub;
+    private JButton mult;
+    private JButton div;
+    private JButton equal;
+    private JButton mod;
+    private JButton negate;
+    private JButton rightBrace;
+    private JButton leftBrace;
+    
+    // I/O
+    private JButton backspace;
+    private JButton ce;
+    private JButton clear;
+    private JButton toggle; // toggle word, byte, etc
+
+    // display
+    private JTextField answer;
+    private JTextField mathFull;
+    
+    // button groups
+    private ButtonGroup buttonGroup1;
+    private ButtonGroup buttonGroup2;
+    private ButtonGroup buttonGroup3;    
+    
+    // number conversions
+    private JTextField binNum;
+    private JButton binRadio;
+    private JTextField decNum;
+    private JButton decRadio;
+    private JTextField hexNum;
+    private JButton hexRadio;
+    private JTextField octNum;
+    private JButton octRadio;
+
+// non-functional
+    private JLabel menuKey;
+    private JButton and;
+    private JButton lsh;
+    private JButton m;
+    private JButton ms;
+    private JButton not;
+    private JButton xor;
+    private JButton second;
+    private JButton period;
+    private JButton or;
+    private JButton rsh;
+    private JButton binPad;
+    private JButton numPad;
+    
+    private JLabel titleProgrammer;
+	
+    //panels
+    JPanel display;
+    JPanel nonFunctional;
+    JPanel someFunctional;
+    JPanel numberKeys;
+    
+    // constructor
     public calculatorMain() {
-        answerStr = "0";
+        
+    	// initialize variables
+    	answerStr = "0";
         initComponents();
         answer.setText(answerStr);
         mathFull.setText(null);
         replace = true;
+        numSystem = "DEC";
+        toggleCounter = 4;
         
         answer.setEditable(false);
         mathFull.setEditable(false);
+        binNum.setEditable(false);
+        hexNum.setEditable(false);
+        octNum.setEditable(false);
+        decNum.setEditable(false);
         
         hexNum.setText(answerStr);
         binNum.setText(answerStr);
         decNum.setText(answerStr);
-        octNum.setText(answerStr);
-        
+        octNum.setText(answerStr);      
     }
     
-    private void setAnswer(String num) {
-        if(answerStr.equals("0")) {
-                replace = true;
+    public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+        UIManager.setLookAndFeel(
+        UIManager.getSystemLookAndFeelClassName());
+        
+        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new calculatorMain().setVisible(true);
             }
+        });
+    }
+    
+    private void addToAnswer(String num) {
+        if(answerStr.equals("0")) {
+            replace = true;	}
         
         if (replace) {
-        answerStr = num; 
-        replace = false;    }
+	        answerStr = num; 
+	        replace = false;    }
         else {
-        answerStr += num; }
-        
-        answer.setText(answerStr);
+        	answerStr += num; }
+  
+        answer.setText(answerStr);   
+    }
+    
+    public void setAnswer(String num) {
+    	answer.setText(num);
+    	
+    	if (numSystem.equalsIgnoreCase("DEC")) {
+	    	hexNum.setText(NumConversion.dec2Hex(num));
+			decNum.setText(num);
+			octNum.setText(NumConversion.dec2Oct(num));
+			binNum.setText(NumConversion.dec2Bin(num));
+    	}
+    	else if (numSystem.equalsIgnoreCase("BIN")) {
+    		hexNum.setText(NumConversion.dec2Hex(NumConversion.bin2Dec(num)));
+    		octNum.setText(NumConversion.dec2Oct(NumConversion.bin2Dec(num)));
+    		decNum.setText(NumConversion.bin2Dec(num));
+    		binNum.setText(num);
+    	}
+    	else if (numSystem.equalsIgnoreCase("OCT")) {
+    		hexNum.setText(NumConversion.dec2Hex(NumConversion.oct2Dec(num)));
+    		octNum.setText(num);
+    		decNum.setText(						 NumConversion.oct2Dec(num));
+    		binNum.setText(NumConversion.dec2Bin(NumConversion.oct2Dec(num)));
+    	}
+    	else if (numSystem.equalsIgnoreCase("HEX")) {
+    		hexNum.setText(num);
+    		octNum.setText(NumConversion.dec2Oct(NumConversion.hex2Dec(num)));
+    		decNum.setText(NumConversion.hex2Dec(num));
+    		binNum.setText(NumConversion.dec2Bin(NumConversion.hex2Dec(num)));
+    	}
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	private void ceActionPerformed(ActionEvent evt) {
+		answerStr = "0";
+		setAnswer(answerStr);
+	}
+
+	private void clearActionPerformed(ActionEvent evt) {
+		mathFull.setText(null);
+		equationStr = "";
+		answerStr = "0";
+		setAnswer(answerStr);
+	}
+
+	private void equalActionPerformed( ActionEvent evt) {
+		answerStr = Calculate.evaluateExpression(mathFull.getText()+answerStr, numSystem);
+		setAnswer(answerStr);
+		mathFull.setText("");
+    }
+    
+    private void zeroActionPerformed( ActionEvent evt) {
+        addToAnswer("0");
+    }
+    
+    private void oneActionPerformed( ActionEvent evt) {
+        addToAnswer("1");
+    }
+
+    private void twoActionPerformed( ActionEvent evt) {
+        addToAnswer("2");
+    }
+    
+    private void threeActionPerformed( ActionEvent evt) {
+        addToAnswer("3");
+    }
+    
+    private void fourActionPerformed( ActionEvent evt) {
+        addToAnswer("4");
+    }
+
+    private void fiveActionPerformed( ActionEvent evt) {
+        addToAnswer("5");
+    }
+    
+    private void sixActionPerformed( ActionEvent evt) {
+        addToAnswer("6");
+    }
+    
+    private void sevenActionPerformed( ActionEvent evt) {
+        addToAnswer("7");
+    }
+
+    private void eightActionPerformed( ActionEvent evt) {
+        addToAnswer("8");
+    }
+    
+    private void nineActionPerformed( ActionEvent evt) {
+        addToAnswer("9");
+    }
+    
+    private void aActionPerformed( ActionEvent evt) {
+        addToAnswer("A");
+    }
+
+    private void bActionPerformed( ActionEvent evt) {
+        addToAnswer("B");
+    }
+    
+    private void cActionPerformed( ActionEvent evt) {
+        addToAnswer("C");
+    }
+    
+    private void dActionPerformed( ActionEvent evt) {
+        addToAnswer("D");
+    }
+    
+    private void eActionPerformed( ActionEvent evt) {
+        addToAnswer("E");
+    }
+    
+    private void fActionPerformed( ActionEvent evt) {
+        addToAnswer("F");
+    }
+    
+    private void backspaceActionPerformed( ActionEvent evt) {
+        replace = true;
+        if(answerStr.length() <= 1) {
+            addToAnswer("0");
+        }
+        else {
+            addToAnswer(answerStr.substring(0, answerStr.length() - 1));
+        }
+    }
+
+    private void addActionPerformed( ActionEvent evt) {
+        mathFull.setText(mathFull.getText() + answerStr + "+");
+        answerStr = "0";
+        setAnswer("0");
+    }
+    
+    private void subActionPerformed(ActionEvent evt) {
+    	mathFull.setText(mathFull.getText() + answerStr + "-");
+    	 answerStr = "0";
+        setAnswer("0");
+	}
+
+    private void divActionPerformed( ActionEvent evt) {
+    	 mathFull.setText(mathFull.getText() + answerStr + "/");
+    	 answerStr = "0";
+        setAnswer("0");
+    }
+    
+    private void multActionPerformed( ActionEvent evt) {
+    	 mathFull.setText(mathFull.getText() + answerStr + "*");
+    	 answerStr = "0";
+        setAnswer("0");
+    }
+       
+    private void rightBraceActionPerformed( ActionEvent evt) {  
+		mathFull.setText(mathFull.getText() + answer.getText() + ")");	
+		setAnswer("0");
+    }
+    
+    private void leftBraceActionPerformed(ActionEvent evt) {
+		mathFull.setText(mathFull.getText()+"(");		
+	}
+
+    protected void modActionPerformed(ActionEvent evt) {
+    	//TODO
+	}
+    
+    protected void toggleActionPerformed(ActionEvent evt) {
+    	toggleCounter++;
+    	if (toggleCounter % 4 == 1) {
+    		toggle.setText("QWORD");
+    	}
+    	else if (toggleCounter % 4 == 2) {
+    		toggle.setText("DWORD");
+    	}
+    	else if (toggleCounter % 4 == 3) {
+    		toggle.setText("WORD");
+    	}
+    	else if (toggleCounter % 4 == 0) {
+    		toggle.setText("BYTE");
+    	}
+    	
+	}
+    
+    private void decRadioActionPerformed( ActionEvent evt) {
+        numSystem = "DEC";
+        answer.setText(decNum.getText());
+        answerStr = answer.getText();
+    	zero.setEnabled(true);
+        one.setEnabled(true);
+        two.setEnabled(true);
+        three.setEnabled(true);
+        four.setEnabled(true); 
+        five.setEnabled(true);
+        six.setEnabled(true);
+        seven.setEnabled(true);
+        eight.setEnabled(true);
+        nine.setEnabled(true);
+        a.setEnabled(false);
+        b.setEnabled(false);
+        c.setEnabled(false);
+        d.setEnabled(false);
+        e.setEnabled(false);
+        f.setEnabled(false);
+    }
+
+    private void hexRadioActionPerformed( ActionEvent evt) {
+        numSystem = "HEX";
+        answer.setText(hexNum.getText());
+        answerStr = answer.getText();
+    	zero.setEnabled(true);
+        one.setEnabled(true);
+        two.setEnabled(true);
+        three.setEnabled(true);
+        four.setEnabled(true);
+        five.setEnabled(true);
+        six.setEnabled(true);
+        seven.setEnabled(true);
+        eight.setEnabled(true);
+        nine.setEnabled(true);
+        a.setEnabled(true);
+        b.setEnabled(true);
+        c.setEnabled(true);
+        d.setEnabled(true);
+        e.setEnabled(true);
+        f.setEnabled(true);
+    }
+
+    private void octRadioActionPerformed( ActionEvent evt) {
+        numSystem = "OCT";
+        answer.setText(octNum.getText());
+        answerStr = answer.getText();
+    	zero.setEnabled(true);
+        one.setEnabled(true);
+        two.setEnabled(true);
+        three.setEnabled(true);
+        four.setEnabled(true);
+        five.setEnabled(true);
+        six.setEnabled(true);
+        seven.setEnabled(true);
+        eight.setEnabled(false);
+        nine.setEnabled(false);
+        a.setEnabled(false);
+        b.setEnabled(false);
+        c.setEnabled(false);
+        d.setEnabled(false);
+        e.setEnabled(false);
+        f.setEnabled(false);
+    }
+
+    private void binRadioActionPerformed( ActionEvent evt) {
+        numSystem = "BIN";
+        answer.setText(binNum.getText());
+        answerStr = answer.getText();
+    	
+        zero.setEnabled(true);
+        one.setEnabled(true);
+        two.setEnabled(false);
+        three.setEnabled(false);
+        four.setEnabled(false);
+        five.setEnabled(false);
+        six.setEnabled(false);
+        seven.setEnabled(false);
+        eight.setEnabled(false);
+        nine.setEnabled(false);
+        a.setEnabled(false);
+        b.setEnabled(false);
+        c.setEnabled(false);
+        d.setEnabled(false);
+        e.setEnabled(false);
+        f.setEnabled(false);
+    }
+
+    protected void negateActionPerformed(ActionEvent evt) {
+    }
+
     private void initComponents() {
-
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane1 = new javax.swing.JEditorPane();
-        five = new javax.swing.JButton();
-        six = new javax.swing.JButton();
-        sub = new javax.swing.JButton();
-        eight = new javax.swing.JButton();
-        nine = new javax.swing.JButton();
-        mult = new javax.swing.JButton();
-        clear = new javax.swing.JButton();
-        backspace = new javax.swing.JButton();
-        div = new javax.swing.JButton();
-        xor = new javax.swing.JButton();
-        not = new javax.swing.JButton();
-        and = new javax.swing.JButton();
-        zero = new javax.swing.JButton();
-        period = new javax.swing.JButton();
-        equal = new javax.swing.JButton();
-        two = new javax.swing.JButton();
-        three = new javax.swing.JButton();
-        add = new javax.swing.JButton();
-        lsh = new javax.swing.JButton();
-        rsh = new javax.swing.JButton();
-        or = new javax.swing.JButton();
-        leftBrace = new javax.swing.JButton();
-        rightBrace = new javax.swing.JButton();
-        negate = new javax.swing.JButton();
-        e = new javax.swing.JButton();
-        f = new javax.swing.JButton();
-        one = new javax.swing.JButton();
-        c = new javax.swing.JButton();
-        d = new javax.swing.JButton();
-        four = new javax.swing.JButton();
-        a = new javax.swing.JButton();
-        b = new javax.swing.JButton();
-        seven = new javax.swing.JButton();
-        second = new javax.swing.JButton();
-        mod = new javax.swing.JButton();
-        ce = new javax.swing.JButton();
-        titleProgrammer = new javax.swing.JLabel();
-        answer = new javax.swing.JTextField();
-        decRadio = new javax.swing.JRadioButton();
-        hexRadio = new javax.swing.JRadioButton();
-        octRadio = new javax.swing.JRadioButton();
-        binRadio = new javax.swing.JRadioButton();
-        menuKey = new javax.swing.JLabel();
-        ms = new javax.swing.JButton();
-        m = new javax.swing.JButton();
-        numPad = new javax.swing.JButton();
-        binPad = new javax.swing.JButton();
-        toggle = new javax.swing.JButton();
-        decNum = new javax.swing.JTextField();
-        hexNum = new javax.swing.JTextField();
-        binNum = new javax.swing.JTextField();
-        octNum = new javax.swing.JTextField();
-        mathFull = new javax.swing.JTextField();
-
-        jScrollPane1.setViewportView(jEditorPane1);
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        buttonGroup1 = new ButtonGroup();
+        buttonGroup2 = new ButtonGroup();
+        buttonGroup3 = new ButtonGroup();
+        
+        sub = new JButton();
+        mult = new JButton();
+        div = new JButton();
+        equal = new JButton();
+        
+        a = new  JButton();
+        b = new  JButton();
+        c = new  JButton();
+        d = new  JButton();
+        e = new  JButton();
+        f = new  JButton();
+        
+        zero = new JButton();
+        one = new JButton();
+        two = new JButton();
+        three = new JButton();
+        four = new  JButton();
+        five = new JButton();
+        six = new JButton();
+        seven = new JButton();
+        eight = new JButton();
+        nine = new JButton();
+        
+        clear = new JButton();
+        backspace = new JButton();
+        xor = new JButton();
+        not = new JButton();
+        and = new JButton();
+        period = new JButton();
+        
+        add = new JButton();
+        lsh = new JButton();
+        rsh = new JButton();
+        or = new JButton();
+        leftBrace = new JButton();
+        rightBrace = new JButton();
+        negate = new  JButton();
+        
+        second = new  JButton();
+        mod = new  JButton();
+        ce = new  JButton();
+        titleProgrammer = new  JLabel();
+        answer = new  JTextField();
+        decRadio = new  JButton();
+        hexRadio = new  JButton();
+        octRadio = new  JButton();
+        binRadio = new  JButton();
+        menuKey = new  JLabel();
+        ms = new  JButton();
+        m = new  JButton();
+        numPad = new  JButton();
+        binPad = new  JButton();
+        toggle = new  JButton();
+        decNum = new  JTextField();
+        hexNum = new  JTextField();
+        binNum = new  JTextField();
+        octNum = new  JTextField();
+        mathFull = new  JTextField();
+        
+        setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE);
         setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         setLocationByPlatform(true);
+        setTitle("Calculator");
         setName("mainFrame"); // NOI18N
+        setSize(400, 600);
         setResizable(false);
 
         five.setBackground(new java.awt.Color(255, 255, 255));
@@ -128,9 +494,9 @@ public class calculatorMain extends javax.swing.JFrame {
         five.setText("5");
         five.setBorder(null);
         buttonGroup1.add(five);
-        five.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        five.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        five.setMargin(new Insets(2, 2, 2, 2));
+        five.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 fiveActionPerformed(evt);
             }
         });
@@ -141,8 +507,8 @@ public class calculatorMain extends javax.swing.JFrame {
         six.setBorder(null);
         buttonGroup1.add(six);
         six.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        six.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        six.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 sixActionPerformed(evt);
             }
         });
@@ -152,6 +518,11 @@ public class calculatorMain extends javax.swing.JFrame {
         sub.setText("-");
         sub.setBorder(null);
         sub.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        sub.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                subActionPerformed(evt);
+            }
+        });
 
         eight.setBackground(new java.awt.Color(255, 255, 255));
         eight.setFont(new java.awt.Font("Segoe UI Black", 0, 12)); // NOI18N
@@ -159,8 +530,8 @@ public class calculatorMain extends javax.swing.JFrame {
         eight.setBorder(null);
         buttonGroup1.add(eight);
         eight.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        eight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        eight.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 eightActionPerformed(evt);
             }
         });
@@ -171,8 +542,8 @@ public class calculatorMain extends javax.swing.JFrame {
         nine.setBorder(null);
         buttonGroup1.add(nine);
         nine.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        nine.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        nine.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 nineActionPerformed(evt);
             }
         });
@@ -182,20 +553,30 @@ public class calculatorMain extends javax.swing.JFrame {
         mult.setText("*");
         mult.setBorder(null);
         mult.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        mult.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                multActionPerformed(evt);
+            }
+        });
 
         clear.setBackground(new java.awt.Color(245, 245, 245));
         clear.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
         clear.setText("C");
         clear.setBorder(null);
         clear.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        clear.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                clearActionPerformed(evt);
+            }
+        });
 
         backspace.setBackground(new java.awt.Color(245, 245, 245));
         backspace.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         backspace.setText("<x");
         backspace.setBorder(null);
         backspace.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        backspace.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        backspace.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 backspaceActionPerformed(evt);
             }
         });
@@ -205,8 +586,8 @@ public class calculatorMain extends javax.swing.JFrame {
         div.setText("/");
         div.setBorder(null);
         div.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        div.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        div.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 divActionPerformed(evt);
             }
         });
@@ -217,23 +598,13 @@ public class calculatorMain extends javax.swing.JFrame {
         xor.setBorder(null);
         xor.setEnabled(false);
         xor.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        xor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xorActionPerformed(evt);
-            }
-        });
 
         not.setBackground(new java.awt.Color(245, 245, 245));
         not.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         not.setText("Not");
         not.setBorder(null);
         not.setEnabled(false);
-        not.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        not.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                notActionPerformed(evt);
-            }
-        });
+        not.setMargin(new java.awt.Insets(2, 2, 2, 2));       
 
         and.setBackground(new java.awt.Color(245, 245, 245));
         and.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
@@ -241,11 +612,6 @@ public class calculatorMain extends javax.swing.JFrame {
         and.setBorder(null);
         and.setEnabled(false);
         and.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        and.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                andActionPerformed(evt);
-            }
-        });
 
         zero.setBackground(new java.awt.Color(255, 255, 255));
         zero.setFont(new java.awt.Font("Segoe UI Black", 0, 12)); // NOI18N
@@ -253,8 +619,8 @@ public class calculatorMain extends javax.swing.JFrame {
         zero.setBorder(null);
         buttonGroup1.add(zero);
         zero.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        zero.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        zero.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 zeroActionPerformed(evt);
             }
         });
@@ -263,20 +629,15 @@ public class calculatorMain extends javax.swing.JFrame {
         period.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         period.setText(".");
         period.setBorder(null);
-        period.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        period.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                periodActionPerformed(evt);
-            }
-        });
+        period.setMargin(new java.awt.Insets(2, 2, 2, 2));        
 
         equal.setBackground(new java.awt.Color(245, 245, 245));
         equal.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         equal.setText("=");
         equal.setBorder(null);
         equal.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        equal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        equal.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 equalActionPerformed(evt);
             }
         });
@@ -287,8 +648,8 @@ public class calculatorMain extends javax.swing.JFrame {
         two.setBorder(null);
         buttonGroup1.add(two);
         two.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        two.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        two.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 twoActionPerformed(evt);
             }
         });
@@ -299,8 +660,8 @@ public class calculatorMain extends javax.swing.JFrame {
         three.setBorder(null);
         buttonGroup1.add(three);
         three.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        three.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        three.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 threeActionPerformed(evt);
             }
         });
@@ -310,8 +671,8 @@ public class calculatorMain extends javax.swing.JFrame {
         add.setText("+");
         add.setBorder(null);
         add.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        add.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        add.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 addActionPerformed(evt);
             }
         });
@@ -321,24 +682,14 @@ public class calculatorMain extends javax.swing.JFrame {
         lsh.setText("Lsh");
         lsh.setBorder(null);
         lsh.setEnabled(false);
-        lsh.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        lsh.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lshActionPerformed(evt);
-            }
-        });
+        lsh.setMargin(new java.awt.Insets(2, 2, 2, 2));        
 
         rsh.setBackground(new java.awt.Color(245, 245, 245));
         rsh.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         rsh.setText("Rsh");
         rsh.setBorder(null);
         rsh.setEnabled(false);
-        rsh.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        rsh.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rshActionPerformed(evt);
-            }
-        });
+        rsh.setMargin(new java.awt.Insets(2, 2, 2, 2));        
 
         or.setBackground(new java.awt.Color(245, 245, 245));
         or.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
@@ -352,14 +703,19 @@ public class calculatorMain extends javax.swing.JFrame {
         leftBrace.setText("(");
         leftBrace.setBorder(null);
         leftBrace.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        leftBrace.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                leftBraceActionPerformed(evt);
+            }
+        });
 
         rightBrace.setBackground(new java.awt.Color(245, 245, 245));
         rightBrace.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         rightBrace.setText(")");
         rightBrace.setBorder(null);
         rightBrace.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        rightBrace.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        rightBrace.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 rightBraceActionPerformed(evt);
             }
         });
@@ -369,6 +725,11 @@ public class calculatorMain extends javax.swing.JFrame {
         negate.setText("+/-");
         negate.setBorder(null);
         negate.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        negate.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                negateActionPerformed(evt);
+            }
+        });
 
         e.setBackground(new java.awt.Color(255, 255, 255));
         e.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
@@ -377,8 +738,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(e);
         e.setDefaultCapable(false);
         e.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        e.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        e.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 eActionPerformed(evt);
             }
         });
@@ -390,8 +751,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(f);
         f.setDefaultCapable(false);
         f.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        f.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        f.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 fActionPerformed(evt);
             }
         });
@@ -402,8 +763,8 @@ public class calculatorMain extends javax.swing.JFrame {
         one.setBorder(null);
         buttonGroup1.add(one);
         one.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        one.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        one.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 oneActionPerformed(evt);
             }
         });
@@ -415,8 +776,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(c);
         c.setDefaultCapable(false);
         c.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        c.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        c.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 cActionPerformed(evt);
             }
         });
@@ -428,8 +789,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(d);
         d.setDefaultCapable(false);
         d.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        d.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        d.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 dActionPerformed(evt);
             }
         });
@@ -440,8 +801,8 @@ public class calculatorMain extends javax.swing.JFrame {
         four.setBorder(null);
         buttonGroup1.add(four);
         four.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        four.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        four.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 fourActionPerformed(evt);
             }
         });
@@ -453,8 +814,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(a);
         a.setDefaultCapable(false);
         a.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        a.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        a.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 aActionPerformed(evt);
             }
         });
@@ -467,8 +828,8 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup2.add(b);
         b.setDefaultCapable(false);
         b.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        b.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        b.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 bActionPerformed(evt);
             }
         });
@@ -479,8 +840,8 @@ public class calculatorMain extends javax.swing.JFrame {
         seven.setBorder(null);
         buttonGroup1.add(seven);
         seven.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        seven.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        seven.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 sevenActionPerformed(evt);
             }
         });
@@ -495,49 +856,52 @@ public class calculatorMain extends javax.swing.JFrame {
         mod.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         mod.setText("Mod");
         mod.setBorder(null);
-        mod.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        mod.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        mod.setMargin(new java.awt.Insets(2, 2, 2, 2));        
+        mod.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 modActionPerformed(evt);
             }
         });
-
+        
         ce.setBackground(new java.awt.Color(245, 245, 245));
         ce.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
         ce.setText("CE");
         ce.setBorder(null);
         ce.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        ce.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                ceActionPerformed(evt);
+            }
+        });
 
         titleProgrammer.setFont(new java.awt.Font("Segoe UI Semibold", 1, 24)); // NOI18N
-        titleProgrammer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titleProgrammer.setHorizontalAlignment( SwingConstants.CENTER);
         titleProgrammer.setText("Programmer");
         titleProgrammer.setPreferredSize(new java.awt.Dimension(60, 14));
 
         answer.setBackground(new java.awt.Color(240, 240, 240));
         answer.setFont(new java.awt.Font("Segoe UI Historic", 1, 18)); // NOI18N
-        answer.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        answer.setHorizontalAlignment( JTextField.RIGHT);
         answer.setText("Value here");
-        answer.setBorder(null);
-        answer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                answerActionPerformed(evt);
-            }
-        });
+        answer.setBorder(null);        
 
         buttonGroup3.add(decRadio);
         decRadio.setFont(new java.awt.Font("Segoe UI Historic", 1, 12)); // NOI18N
         decRadio.setText("DEC");
-        decRadio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        decRadio.setBorder(null);
+        decRadio.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 decRadioActionPerformed(evt);
             }
         });
 
         buttonGroup3.add(hexRadio);
         hexRadio.setFont(new java.awt.Font("Segoe UI Historic", 1, 12)); // NOI18N
+        hexRadio.setBackground(new java.awt.Color(240, 240, 240));
         hexRadio.setText("HEX");
-        hexRadio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        hexRadio.setBorder(null);
+        hexRadio.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 hexRadioActionPerformed(evt);
             }
         });
@@ -545,8 +909,9 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup3.add(octRadio);
         octRadio.setFont(new java.awt.Font("Segoe UI Historic", 1, 12)); // NOI18N
         octRadio.setText("OCT");
-        octRadio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        octRadio.setBorder(null);
+        octRadio.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 octRadioActionPerformed(evt);
             }
         });
@@ -554,14 +919,15 @@ public class calculatorMain extends javax.swing.JFrame {
         buttonGroup3.add(binRadio);
         binRadio.setFont(new java.awt.Font("Segoe UI Historic", 1, 12)); // NOI18N
         binRadio.setText("BIN");
-        binRadio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        binRadio.setBorder(null);
+        binRadio.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
                 binRadioActionPerformed(evt);
             }
         });
 
-        menuKey.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        menuKey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons8-menu-30.png"))); // NOI18N
+        menuKey.setHorizontalAlignment( SwingConstants.CENTER);
+        menuKey.setIcon(new  ImageIcon(getClass().getResource("/icons8-menu-30.png"))); // NOI18N
         menuKey.setAlignmentY(0.0F);
         menuKey.setEnabled(false);
         menuKey.setName("Menu"); // NOI18N
@@ -572,50 +938,36 @@ public class calculatorMain extends javax.swing.JFrame {
         ms.setText("MS");
         ms.setBorder(null);
         ms.setEnabled(false);
-        ms.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        ms.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                msActionPerformed(evt);
-            }
-        });
+        ms.setMargin(new java.awt.Insets(2, 2, 2, 2));        
 
         m.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         m.setText("M");
         m.setBorder(null);
         m.setEnabled(false);
-        m.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        m.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mActionPerformed(evt);
-            }
-        });
+        m.setMargin(new java.awt.Insets(2, 2, 2, 2));        
 
         numPad.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        numPad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons8-keypad-24.png"))); // NOI18N
+        numPad.setIcon(new  ImageIcon(getClass().getResource("/icons8-keypad-24.png"))); // NOI18N
         numPad.setBorder(null);
         numPad.setEnabled(false);
         numPad.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        numPad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                numPadActionPerformed(evt);
-            }
-        });
 
         binPad.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        binPad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons8-data-24.png"))); // NOI18N
+        binPad.setIcon(new  ImageIcon(getClass().getResource("/icons8-data-24.png"))); // NOI18N
         binPad.setBorder(null);
         binPad.setEnabled(false);
         binPad.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        binPad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                binPadActionPerformed(evt);
-            }
-        });
 
         toggle.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
         toggle.setText("WORD");
         toggle.setBorder(null);
         toggle.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        toggle.addActionListener(new  ActionListener() {
+            public void actionPerformed( ActionEvent evt) {
+                toggleActionPerformed(evt);
+            }
+        });
+        
 
         decNum.setBackground(new java.awt.Color(240, 240, 240));
         decNum.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
@@ -635,582 +987,240 @@ public class calculatorMain extends javax.swing.JFrame {
         octNum.setBackground(new java.awt.Color(240, 240, 240));
         octNum.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         octNum.setText("value here");
-        octNum.setBorder(null);
-        octNum.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                octNumActionPerformed(evt);
-            }
-        });
+        octNum.setBorder(null);        
 
         mathFull.setBackground(new java.awt.Color(240, 240, 240));
         mathFull.setFont(new java.awt.Font("Segoe UI Historic", 0, 12)); // NOI18N
-        mathFull.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        mathFull.setHorizontalAlignment( JTextField.TRAILING);
         mathFull.setText("value here");
-        mathFull.setBorder(null);
-        mathFull.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mathFullActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        mathFull.setBorder(null);        
+        
+        GroupLayout layout = new  GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        
+          layout.setHorizontalGroup(
+            layout.createParallelGroup( GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(numPad, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(binPad, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(toggle, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ms, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(m, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(numPad,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(binPad,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(toggle,  GroupLayout.PREFERRED_SIZE, 96,  GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ms,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(m,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(e, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(f, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(one, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(e,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(f,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(one,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(leftBrace, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(rightBrace, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(negate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(leftBrace,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(rightBrace,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(negate,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lsh, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(rsh, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(or, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(lsh,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(rsh,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(or,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(second, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(mod, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(ce, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(second,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(mod,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(ce,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(a, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(b, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(seven, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(a,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(b,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(seven,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(c, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(d, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(four, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(c,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(d,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(four,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))))
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(two, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(three, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(add, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(two,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(three,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(add,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(zero, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(period, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(equal, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(zero,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(period,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(equal,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(xor, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(not, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(and, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(xor,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(not,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(and,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(backspace, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(div, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(clear,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(backspace,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(div,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(eight, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(nine, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(mult, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(eight,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(nine,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(mult,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(five, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(six, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(sub, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                            .addComponent(five,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(six,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(sub,  GroupLayout.PREFERRED_SIZE, 45,  GroupLayout.PREFERRED_SIZE)))))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(binRadio, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(octRadio, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(octNum, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(binRadio,  GroupLayout.Alignment.LEADING,  GroupLayout.DEFAULT_SIZE,  GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(octRadio,  GroupLayout.Alignment.LEADING,  GroupLayout.PREFERRED_SIZE, 60,  GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap( LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(octNum,  GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
                                     .addComponent(binNum)))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(decRadio, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup( GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(decRadio,  GroupLayout.PREFERRED_SIZE, 60,  GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap( LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(decNum))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(hexRadio, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(hexNum, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(menuKey, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup( GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(hexRadio,  GroupLayout.PREFERRED_SIZE, 60,  GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap( LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(hexNum,  GroupLayout.PREFERRED_SIZE, 232,  GroupLayout.PREFERRED_SIZE)))
+                                .addGroup( GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(menuKey,  GroupLayout.PREFERRED_SIZE, 30,  GroupLayout.PREFERRED_SIZE)
                                     .addGap(22, 22, 22)
-                                    .addComponent(titleProgrammer, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(mathFull, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(titleProgrammer,  GroupLayout.PREFERRED_SIZE, 179,  GroupLayout.PREFERRED_SIZE))
+                                .addComponent(mathFull,  GroupLayout.PREFERRED_SIZE, 290,  GroupLayout.PREFERRED_SIZE))))
                     .addComponent(answer))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            layout.createParallelGroup( GroupLayout.Alignment.LEADING)
+            .addGroup( GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(menuKey, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                    .addComponent(titleProgrammer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(menuKey,  GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                    .addComponent(titleProgrammer,  GroupLayout.DEFAULT_SIZE,  GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(1, 1, 1)
-                .addComponent(mathFull, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(answer, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(mathFull,  GroupLayout.PREFERRED_SIZE, 34,  GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap( LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(answer,  GroupLayout.PREFERRED_SIZE, 39,  GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
                     .addComponent(hexRadio)
-                    .addComponent(hexNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(hexNum,  GroupLayout.PREFERRED_SIZE,  GroupLayout.DEFAULT_SIZE,  GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
                     .addComponent(decRadio)
-                    .addComponent(decNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(decNum,  GroupLayout.PREFERRED_SIZE,  GroupLayout.DEFAULT_SIZE,  GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
                     .addComponent(octRadio)
-                    .addComponent(octNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(octNum,  GroupLayout.PREFERRED_SIZE,  GroupLayout.DEFAULT_SIZE,  GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
                     .addComponent(binRadio)
-                    .addComponent(binNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(numPad, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(ms, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(m, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(binPad, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(toggle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(binNum,  GroupLayout.PREFERRED_SIZE,  GroupLayout.DEFAULT_SIZE,  GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
+                    .addComponent(numPad,  GroupLayout.Alignment.TRAILING,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                    .addGroup( GroupLayout.Alignment.TRAILING, layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                        .addComponent(ms,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                        .addComponent(m,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                    .addComponent(binPad,  GroupLayout.Alignment.TRAILING,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                    .addComponent(toggle,  GroupLayout.Alignment.TRAILING,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup( GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lsh, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rsh, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(or, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(second, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(mod, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(ce, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(a, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(b, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(seven, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(c, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(d, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(four, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(e, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(f, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(one, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(leftBrace, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rightBrace, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(negate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(lsh,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rsh,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(or,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(second,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(mod,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ce,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(a,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(seven,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(c,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(d,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(four,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(e,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(f,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(one,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(leftBrace,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rightBrace,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(negate,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(xor, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(not, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(and, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(backspace, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(div, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(eight, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(nine, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(mult, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(five, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(six, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(sub, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(two, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(three, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(add, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(zero, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(period, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(equal, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(xor,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(not,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(and,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(clear,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(backspace,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(div,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(eight,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(nine,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(mult,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(five,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(six,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sub,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(two,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(three,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(add,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap( LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup( GroupLayout.Alignment.BASELINE)
+                            .addComponent(zero,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(period,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE)
+                            .addComponent(equal,  GroupLayout.PREFERRED_SIZE, 35,  GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
-        );
-
-        hexRadio.getAccessibleContext().setAccessibleParent(hexNum);
-        hexNum.getAccessibleContext().setAccessibleParent(hexNum);
-
+        );    
         pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void sixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sixActionPerformed
-        // TODO add your handling code here:
-        setAnswer("6");
-    }//GEN-LAST:event_sixActionPerformed
-
-    private void nineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nineActionPerformed
-        // TODO add your handling code here:
-        setAnswer("9");
-
-    }//GEN-LAST:event_nineActionPerformed
-
-    private void backspaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backspaceActionPerformed
-        // TODO add your handling code here:
-        replace = true;
-        if(answerStr.length() <= 1) {
-            setAnswer("0");
-        }
-        else {
-            setAnswer(answerStr.substring(0, answerStr.length() - 1));
-        }
-        
-    }//GEN-LAST:event_backspaceActionPerformed
-
-    private void notActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_notActionPerformed
-
-    private void periodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_periodActionPerformed
-        // TODO add your handling code here:
-        setAnswer(".");
-    }//GEN-LAST:event_periodActionPerformed
-
-    private void threeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_threeActionPerformed
-        // TODO add your handling code here:
-        setAnswer("3");
-    }//GEN-LAST:event_threeActionPerformed
-
-    private void rshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rshActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rshActionPerformed
-
-    private void rightBraceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rightBraceActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rightBraceActionPerformed
-
-    private void fActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fActionPerformed
-        // TODO add your handling code here:
-        setAnswer("F");
-    }//GEN-LAST:event_fActionPerformed
-
-    private void dActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dActionPerformed
-        // TODO add your handling code here:
-        setAnswer("D");
-
-    }//GEN-LAST:event_dActionPerformed
-
-    private void bActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bActionPerformed
-        // TODO add your handling code here:
-        setAnswer("B");
-    }//GEN-LAST:event_bActionPerformed
-
-    private void modActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_modActionPerformed
-
-    private void equalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equalActionPerformed
-        // TODO add your handling code here:
-        setAnswer(mathFull.getText());
-    }//GEN-LAST:event_equalActionPerformed
-
-    private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
-        // TODO add your handling code here:
-        mathFull.setText(answerStr+"+");
-    }//GEN-LAST:event_addActionPerformed
-
-    private void divActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_divActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_divActionPerformed
-
-    private void andActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_andActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_andActionPerformed
-
-    private void xorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_xorActionPerformed
-
-    private void lshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lshActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lshActionPerformed
-
-    private void decRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decRadioActionPerformed
-        zero.setEnabled(true);
-        one.setEnabled(true);
-        two.setEnabled(true);
-        three.setEnabled(true);
-        four.setEnabled(true);
-        five.setEnabled(true);
-        six.setEnabled(true);
-        seven.setEnabled(true);
-        eight.setEnabled(true);
-        nine.setEnabled(true);
-        a.setEnabled(false);
-        b.setEnabled(false);
-        c.setEnabled(false);
-        d.setEnabled(false);
-        e.setEnabled(false);
-        f.setEnabled(false);
-    }//GEN-LAST:event_decRadioActionPerformed
-
-    private void hexRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hexRadioActionPerformed
-        // TODO add your handling code here:
-        zero.setEnabled(true);
-        one.setEnabled(true);
-        two.setEnabled(true);
-        three.setEnabled(true);
-        four.setEnabled(true);
-        five.setEnabled(true);
-        six.setEnabled(true);
-        seven.setEnabled(true);
-        eight.setEnabled(true);
-        nine.setEnabled(true);
-        a.setEnabled(true);
-        b.setEnabled(true);
-        c.setEnabled(true);
-        d.setEnabled(true);
-        e.setEnabled(true);
-        f.setEnabled(true);
-    }//GEN-LAST:event_hexRadioActionPerformed
-
-    private void octRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_octRadioActionPerformed
-        // TODO add your handling code here:
-        zero.setEnabled(true);
-        one.setEnabled(true);
-        two.setEnabled(true);
-        three.setEnabled(true);
-        four.setEnabled(true);
-        five.setEnabled(true);
-        six.setEnabled(true);
-        seven.setEnabled(true);
-        eight.setEnabled(false);
-        nine.setEnabled(false);
-        a.setEnabled(false);
-        b.setEnabled(false);
-        c.setEnabled(false);
-        d.setEnabled(false);
-        e.setEnabled(false);
-        f.setEnabled(false);
-    }//GEN-LAST:event_octRadioActionPerformed
-
-    private void binRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binRadioActionPerformed
-        // TODO add your handling code here:
-        zero.setEnabled(true);
-        one.setEnabled(true);
-        two.setEnabled(false);
-        three.setEnabled(false);
-        four.setEnabled(false);
-        five.setEnabled(false);
-        six.setEnabled(false);
-        seven.setEnabled(false);
-        eight.setEnabled(false);
-        nine.setEnabled(false);
-        a.setEnabled(false);
-        b.setEnabled(false);
-        c.setEnabled(false);
-        d.setEnabled(false);
-        e.setEnabled(false);
-        f.setEnabled(false);
-        
-
-    }//GEN-LAST:event_binRadioActionPerformed
-
-    private void eActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eActionPerformed
-        // TODO add your handling code here:
-        setAnswer("E");
-    }//GEN-LAST:event_eActionPerformed
-
-    private void msActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_msActionPerformed
-
-    private void mActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_mActionPerformed
-
-    private void numPadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_numPadActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_numPadActionPerformed
-
-    private void answerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_answerActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_answerActionPerformed
-
-    private void binPadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binPadActionPerformed
-        // TODO add your handling code here:
-        binNum.setText(Integer.toString(Integer.parseInt(answer.getText()),2));
-    }//GEN-LAST:event_binPadActionPerformed
-
-    private void octNumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_octNumActionPerformed
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_octNumActionPerformed
-
-    private void mathFullActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mathFullActionPerformed
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_mathFullActionPerformed
-
-    private void aActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aActionPerformed
-        // TODO add your handling code here:
-        setAnswer("A");
-    }//GEN-LAST:event_aActionPerformed
-
-    private void sevenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sevenActionPerformed
-        // TODO add your handling code here:
-        setAnswer("7");
-    }//GEN-LAST:event_sevenActionPerformed
-
-    private void eightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eightActionPerformed
-        // TODO add your handling code here:
-        setAnswer("8");
-    }//GEN-LAST:event_eightActionPerformed
-
-    private void cActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cActionPerformed
-        // TODO add your handling code here:
-        setAnswer("C");
-    }//GEN-LAST:event_cActionPerformed
-
-    private void fourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fourActionPerformed
-        // TODO add your handling code here:
-        setAnswer("4");
-    }//GEN-LAST:event_fourActionPerformed
-
-    private void fiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fiveActionPerformed
-        // TODO add your handling code here:
-        setAnswer("5");
-    }//GEN-LAST:event_fiveActionPerformed
-
-    private void oneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_oneActionPerformed
-        // TODO add your handling code here:
-        setAnswer("1");
-    }//GEN-LAST:event_oneActionPerformed
-
-    private void twoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_twoActionPerformed
-        // TODO add your handling code here:
-        setAnswer("2");
-    }//GEN-LAST:event_twoActionPerformed
-
-    private void zeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zeroActionPerformed
-        // TODO add your handling code here:
-        setAnswer("0");
-    }//GEN-LAST:event_zeroActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-        UIManager.setLookAndFeel(
-        UIManager.getSystemLookAndFeelClassName());
-        
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new calculatorMain().setVisible(true);
-            }
-        });
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton a;
-    private javax.swing.JButton add;
-    private javax.swing.JButton and;
-    private javax.swing.JTextField answer;
-    private javax.swing.JButton b;
-    private javax.swing.JButton backspace;
-    private javax.swing.JTextField binNum;
-    private javax.swing.JButton binPad;
-    private javax.swing.JRadioButton binRadio;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
-    private javax.swing.JButton c;
-    private javax.swing.JButton ce;
-    private javax.swing.JButton clear;
-    private javax.swing.JButton d;
-    private javax.swing.JTextField decNum;
-    private javax.swing.JRadioButton decRadio;
-    private javax.swing.JButton div;
-    private javax.swing.JButton e;
-    private javax.swing.JButton eight;
-    private javax.swing.JButton equal;
-    private javax.swing.JButton f;
-    private javax.swing.JButton five;
-    private javax.swing.JButton four;
-    private javax.swing.JTextField hexNum;
-    private javax.swing.JRadioButton hexRadio;
-    private javax.swing.JEditorPane jEditorPane1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton leftBrace;
-    private javax.swing.JButton lsh;
-    private javax.swing.JButton m;
-    private javax.swing.JTextField mathFull;
-    private javax.swing.JLabel menuKey;
-    private javax.swing.JButton mod;
-    private javax.swing.JButton ms;
-    private javax.swing.JButton mult;
-    private javax.swing.JButton negate;
-    private javax.swing.JButton nine;
-    private javax.swing.JButton not;
-    private javax.swing.JButton numPad;
-    private javax.swing.JTextField octNum;
-    private javax.swing.JRadioButton octRadio;
-    private javax.swing.JButton one;
-    private javax.swing.JButton or;
-    private javax.swing.JButton period;
-    private javax.swing.JButton rightBrace;
-    private javax.swing.JButton rsh;
-    private javax.swing.JButton second;
-    private javax.swing.JButton seven;
-    private javax.swing.JButton six;
-    private javax.swing.JButton sub;
-    private javax.swing.JButton three;
-    private javax.swing.JLabel titleProgrammer;
-    private javax.swing.JButton toggle;
-    private javax.swing.JButton two;
-    private javax.swing.JButton xor;
-    private javax.swing.JButton zero;
-    // End of variables declaration//GEN-END:variables
 }
